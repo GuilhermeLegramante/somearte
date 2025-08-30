@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Adicionar Música</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 p-6">
+    <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-xl font-bold mb-4">Adicionar Música</h1>
+
+        <form action="save.php" method="post" enctype="multipart/form-data" class="space-y-4">
+            <!-- Título -->
+            <div>
+                <label class="block text-sm font-medium">Título</label>
+                <input type="text" name="title" class="w-full border rounded p-2" required>
+            </div>
+
+            <!-- Categoria -->
+            <div>
+                <label class="block text-sm font-medium">Categoria</label>
+                <select name="category" class="w-full border rounded p-2" required>
+                    <option value="missa">Missa</option>
+                    <option value="entrada">Entrada</option>
+                    <option value="ato-penitencial">Ato Penitencial</option>
+                    <option value="gloria">Glória</option>
+                    <option value="ofertorio">Ofertório</option>
+                    <option value="comunhao">Comunhão</option>
+                    <option value="final">Final</option>
+                    <option value="mariana">Mariano</option>
+                    <option value="ensaio">Ensaio</option>
+                </select>
+            </div>
+
+            <!-- Upload de Áudio -->
+            <div>
+                <label class="block text-sm font-medium">Áudio (MP3/WAV)</label>
+                <input type="file" name="audio" accept="audio/*,video/mp4" class="w-full border p-2">
+            </div>
+
+            <!-- Link do vídeo -->
+            <div>
+                <label class="block text-sm font-medium">Link do Vídeo (YouTube)</label>
+                <input type="url" name="video" placeholder="https://youtube.com/..." class="w-full border rounded p-2">
+            </div>
+
+            <!-- Upload de PDF -->
+            <div>
+                <label class="block text-sm font-medium">Partitura / Cifra (PDF)</label>
+                <input type="file" name="pdf" accept="application/pdf" class="w-full border p-2">
+            </div>
+
+            <!-- Botão -->
+            <div class="flex justify-end">
+                <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

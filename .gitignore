@@ -1,0 +1,8 @@
+# Pastas de upload
+uploads/
+musicas.json
+
+# Arquivos temporários do sistema
+*.log
+*.tmp
+.DS_Store

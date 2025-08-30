@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Galeria Som e Arte — Jubileu 75 anos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-audio::-webkit-media-controls-panel {
+            background: transparent
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 leading-normal">
+    <header class="bg-gradient-to-r from-sky-700 via-sky-500 to-indigo-600 text-white">
+        <div class="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-2xl font-semibold">
+                    75</div>
+                <div>
+                    <h1 class="text-xl font-bold">Jubileu 75 — Campanha da Mãe Peregrina</h1>
+                    <p class="text-sm opacity-90">Galeria de músicas — Grupo Som e Arte</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="playAllBtn" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-md">▶️ Tocar
+                    tudo</button>
+                <a href="add.html"
+                    class="hidden sm:inline-block bg-white/20 hover:bg-white/30 px-4 py-2 rounded-md">Adicionar
+                    música</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <section class="mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex-1">
+                    <input id="search" type="search" placeholder="Procure por título, parte da letra ou instrumento..."
+                        class="w-full px-4 py-3 rounded-md border border-gray-200 shadow-sm" />
+                </div>
+                <div class="flex items-center gap-2">
+                    <select id="categoryFilter" class="px-3 py-2 rounded-md border">
+                        <option value="all">Todas as categorias</option>
+                        <option value="missa">Missa</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="ofertorio">Ofertório</option>
+                        <option value="comunhao">Comunhão</option>
+                        <option value="final">Final</option>
+                        <option value="mariana">Marianas</option>
+                        <option value="ensaio">Ensaios</option>
+                    </select>
+                    <button id="clearFilters" class="px-3 py-2 rounded-md border bg-white">Limpar</button>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div id="songsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="emptyState" class="hidden text-center text-gray-500 mt-8">Nenhuma música encontrada.</div>
+        </section>
+
+        <section id="contato" class="mt-12 bg-white p-6 rounded-lg shadow-md text-center">
+            <h2 class="text-lg font-semibold mb-4">Entre em contato</h2>
+            <p class="text-sm mb-4">Para enviar arquivos grandes ou cifras, clique no botão abaixo e fale comigo pelo
+                WhatsApp.</p>
+            <a href="https://wa.me/5555999181805" target="_blank"
+                class="inline-block bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition">
+                💬 Falar no WhatsApp
+            </a>
+        </section>
+    </main>
+
+    <footer class="text-center py-6 text-sm text-gray-500">
+        © Jubileu 75 Anos da Campanha da Mãe Peregrina — Grupo Som e Arte
+    </footer>
+
+    <template id="songCardTpl">
+        <article class="bg-white rounded-lg shadow p-4 flex flex-col gap-3">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <h3 class="song-title text-lg font-semibold"></h3>
+                    <p class="song-meta text-sm text-gray-500 mt-1"></p>
+                </div>
+                <div class="text-right text-sm">
+                    <span class="badge-category inline-block px-2 py-1 rounded text-xs font-medium"></span>
+                </div>
+            </div>
+
+            <div>
+                <audio class="w-full" controls preload="none">
+                    <source class="audio-src" src="" />
+                    Seu navegador não suporta elemento de áudio.
+                </audio>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <a class="video-link text-sm underline" target="_blank" rel="noopener">Ver vídeo</a>
+                    <a class="pdf-link text-sm underline" target="_blank" rel="noopener">Partitura / Cifra</a>
+                </div>
+                <div>
+                    <button class="btn-add-fav text-sm px-3 py-1 border rounded">Favoritar</button>
+                </div>
+            </div>
+        </article>
+    </template>
+
+    <script>
+        const songsGrid = document.getElementById('songsGrid');
+        const tpl = document.getElementById('songCardTpl');
+        const search = document.getElementById('search');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const clearFilters = document.getElementById('clearFilters');
+        const emptyState = document.getElementById('emptyState');
+        const playAllBtn = document.getElementById('playAllBtn');
+
+        let songs = [];
+
+        function renderList(list) {
+            songsGrid.innerHTML = '';
+            if (list.length === 0) { emptyState.classList.remove('hidden'); return; } else { emptyState.classList.add('hidden'); }
+
+            list.forEach(song => {
+                const node = tpl.content.cloneNode(true);
+                node.querySelector('.song-title').textContent = song.title;
+                node.querySelector('.song-meta').textContent = song.category ? song.category.toUpperCase() : '';
+                node.querySelector('.badge-category').textContent = song.category || '—';
+                const src = node.querySelector('.audio-src');
+                if (song.audio) { src.src = song.audio; } else { node.querySelector('audio').remove(); }
+
+                const vlink = node.querySelector('.video-link');
+                if (song.video) { vlink.href = song.video; } else { vlink.classList.add('opacity-40', 'pointer-events-none'); vlink.textContent = 'Sem vídeo'; }
+
+                const plink = node.querySelector('.pdf-link');
+                if (song.pdf) { plink.href = song.pdf; } else { plink.classList.add('opacity-40', 'pointer-events-none'); plink.textContent = 'Sem partitura'; }
+
+                const fav = node.querySelector('.btn-add-fav');
+                fav.addEventListener('click', () => {
+                    fav.classList.toggle('bg-yellow-100');
+                    fav.textContent = fav.classList.contains('bg-yellow-100') ? 'Favorito' : 'Favoritar';
+                });
+
+                songsGrid.appendChild(node);
+            });
+        }
+
+        function applyFilters() {
+            const q = search.value.trim().toLowerCase();
+            const cat = categoryFilter.value;
+            const filtered = songs.filter(s => {
+                const matchesQ = q === '' || s.title.toLowerCase().includes(q);
+                const matchesCat = cat === 'all' || s.category === cat;
+                return matchesQ && matchesCat;
+            });
+            renderList(filtered);
+        }
+
+        search.addEventListener('input', applyFilters);
+        categoryFilter.addEventListener('change', applyFilters);
+        clearFilters.addEventListener('click', () => { search.value = ''; categoryFilter.value = 'all'; applyFilters(); });
+
+        playAllBtn.addEventListener('click', () => {
+            const audioEls = Array.from(document.querySelectorAll('#songsGrid audio'));
+            if (audioEls.length === 0) return;
+
+            audioEls.forEach(a => a.pause());
+
+            let idx = 0;
+            function playIndex(i) {
+                if (i >= audioEls.length) return;
+                const a = audioEls[i];
+                a.currentTime = 0;
+                a.play().catch(() => { });
+                a.onended = () => playIndex(i + 1);
+            }
+            playIndex(0);
+        });
+
+        // Carrega músicas do arquivo JSON
+        fetch('musicas.json')
+            .then(res => res.json())
+            .then(data => {
+                songs = data;
+                renderList(songs);
+            })
+            .catch(() => {
+                songs = [];
+                renderList(songs);
+            });
+    </script>
+</body>
+
+</html>
