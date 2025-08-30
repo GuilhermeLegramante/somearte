@@ -1,4 +1,12 @@
 <?php
+// Defina a senha
+$senhaCorreta = 'jubileu75';
+
+// Verifica se a senha enviada é correta
+if (!isset($_POST['senha']) || $_POST['senha'] !== $senhaCorreta) {
+    die("Senha incorreta. Você não tem permissão para enviar arquivos.");
+}
+
 $jsonFile = __DIR__ . '/musicas.json';
 
 // Pastas de upload
@@ -41,7 +49,7 @@ function salvarArquivo($campo, $dir, $tiposPermitidos = [])
 }
 
 // Salva arquivos
-$audioPath = salvarArquivo('audio', $audioDir, ['mp3','wav','mp4']); // adicionamos mp4
+$audioPath = salvarArquivo('audio', $audioDir, ['mp3', 'wav', 'mp4']); // adicionamos mp4
 $pdfPath   = salvarArquivo('pdf', $pdfDir, ['pdf']);
 
 // Nova música
